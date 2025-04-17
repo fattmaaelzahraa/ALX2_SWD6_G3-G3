@@ -1,0 +1,556 @@
+{
+	"info": {
+		"_postman_id": "a0dd25e7-0118-45fa-984f-fca909b9bdfb",
+		"name": "Simple Books Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43261565"
+	},
+	"item": [
+		{
+			"name": "status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/status",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get list of books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body contains only fiction books \", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"fiction\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Connection header is alive\", function () {\r",
+							"    pm.response.to.have.header(\"Connection\", \"keep-alive\");\r",
+							"});\r",
+							"pm.test(\"content-type\", function () {\r",
+							"    pm.response.to.have.header(\"content-type\", \"application/json; charset=utf-8\");\r",
+							"});\r",
+							"\r",
+							"var response = pm.response.json();\r",
+							"pm.test(\"Checking Datatypes\", function() {\r",
+							"    pm.expect(response).to.be.an('array').that.is.not.empty;\r",
+							"    response.forEach(item => {\r",
+							"        pm.expect(item.id).to.be.a('number');\r",
+							"        pm.expect(item.name).to.be.a('string');\r",
+							"        pm.expect(item.type).to.be.a('string');\r",
+							"        pm.expect(item.available).to.be.a('boolean');\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/books?type=fiction&limit=2",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "fiction"
+						},
+						{
+							"key": "limit",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Books ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type\", function () {\r",
+							"    pm.response.to.have.header(\"content-type\", \"application/json; charset=utf-8\");\r",
+							"});\r",
+							"\r",
+							"var response = pm.response.json();\r",
+							"pm.test(\"Checking Type value\", function() {\r",
+							"    pm.expect(response.type).to.be.oneOf(['fiction', 'non-fiction']);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Checking Datatypes\", function() {\r",
+							"        pm.expect(response).to.be.an('object');\r",
+							"        pm.expect(response.id).to.be.a('number');\r",
+							"        pm.expect(response.name).to.be.a('string');\r",
+							"        pm.expect(response.author).to.be.a('string');\r",
+							"        pm.expect(response.type).to.be.a('string');\r",
+							"        pm.expect(response).to.have.property('price').that.is.a('number').and.to.be.above(0);        \r",
+							"        pm.expect(response['current-stock']).to.be.a('number');\r",
+							"        pm.expect(response.available).to.be.a('boolean');\r",
+							"    });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/books/{{bookId}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"books",
+						"{{bookId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201); //created successfully\r",
+							"});\r",
+							"\r",
+							"var response = pm.response.json();\r",
+							"pm.test(\"Valid token\", function() {\r",
+							"    const response = pm.response.json();\r",
+							"    // pm.expect(response).to.have.object('accessToken');\r",
+							"    pm.expect(response.accessToken).to.be.a('string').and.to.have.lengthOf.above(20);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"clientName\": \"Postman\",\r\n   \"clientEmail\": \"ffattim2d@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api-clients/",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api-clients",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit an order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201); //created successfully\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content Type is present\",function(){\r",
+							"    pm.response.to.have.header(\"content-type\");\r",
+							"})\r",
+							"\r",
+							"var response = pm.response.json();\r",
+							"pm.test(\"checking data types\", function() {\r",
+							"    pm.expect(response).to.be.an('object');\r",
+							"        pm.expect(response.orderId).to.be.a('string');\r",
+							"        pm.expect(response.created).to.be.a('boolean');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dae715ae04cbe4ff76c4d1c5945358357435cc40a3b21f7394b56b46ae8f7460",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"bookId\": 1,\r\n  \"customerName\": \"fatmaelzahraa\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/orders",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all orders",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var response = pm.response.json();\r",
+							"pm.test(\"checking data types\", function () {\r",
+							"    pm.expect(response).to.be.an('array');\r",
+							"\r",
+							"    response.forEach(item => {\r",
+							"        pm.expect(item.id).to.be.a('string');\r",
+							"        pm.expect(item.bookId).to.be.a('number');\r",
+							"        pm.expect(item.customerName).to.be.a('string');\r",
+							"        pm.expect(item.createdBy).to.be.a('string');\r",
+							"        pm.expect(item.quantity).to.be.a('number').and.to.be.above(0);\r",
+							"        pm.expect(item.timestamp).to.be.a('number');\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dae715ae04cbe4ff76c4d1c5945358357435cc40a3b21f7394b56b46ae8f7460",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/orders",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(204); //No content\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dae715ae04cbe4ff76c4d1c5945358357435cc40a3b21f7394b56b46ae8f7460",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/orders/:orderId",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"orders",
+						":orderId"
+					],
+					"variable": [
+						{
+							"key": "orderId",
+							"value": "A_odj4tmj2CSTG5OhdzER"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get an order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// pm.test(\"Status code is 200\", function () {\r",
+							"//     pm.response.to.have.status(200);\r",
+							"// });\r",
+							"// pm.test(\"content-type\", function () {\r",
+							"//     pm.response.to.have.header(\"content-type\", \"application/json; charset=utf-8\");\r",
+							"// });\r",
+							"\r",
+							"// var response = pm.response.json();\r",
+							"// pm.test(\"Checking Datatypes\", function() {\r",
+							"//     pm.expect(response).to.be.an('object');\r",
+							"        \r",
+							"//         pm.expect(response.id).to.be.a('string');\r",
+							"//         pm.expect(response.bookId).to.be.a('number');\r",
+							"//         pm.expect(response.customerName).to.be.a('string');\r",
+							"//         pm.expect(response.createdBy).to.be.a('string');\r",
+							"//         pm.expect(response.quantity).to.be.a('number');\r",
+							"//         pm.expect(response.timestamp).to.be.a('number');\r",
+							"// });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dae715ae04cbe4ff76c4d1c5945358357435cc40a3b21f7394b56b46ae8f7460",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/orders/:orderId",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"orders",
+						":orderId"
+					],
+					"variable": [
+						{
+							"key": "orderId",
+							"value": "VlzkzpSkY5bVPSgsPExuu"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update an order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"status is ok\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dae715ae04cbe4ff76c4d1c5945358357435cc40a3b21f7394b56b46ae8f7460",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customerName\": \"ali\",\r\n  \"bookId\": 4\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/orders/:orderId",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"orders",
+						":orderId"
+					],
+					"variable": [
+						{
+							"key": "orderId",
+							"value": "hHNLL6RrRabL2az-pC7eo"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a single book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"content-type\", function () {\r",
+							"    pm.response.to.have.header(\"content-type\", \"application/json; charset=utf-8\");\r",
+							"});\r",
+							"\r",
+							"var response = pm.response.json();\r",
+							"pm.test(\"Checking Datatypes\", function() {\r",
+							"    pm.expect(response).to.be.an('object');\r",
+							"        \r",
+							"        pm.expect(response.id).to.be.a('number');\r",
+							"        pm.expect(response.name).to.be.a('string');\r",
+							"        pm.expect(response.author).to.be.a('string');\r",
+							"        pm.expect(response.type).to.be.a('string');\r",
+							"        pm.expect(response.price).to.be.a('number');\r",
+							"        pm.expect(response['current-stock']).to.be.a('number');\r",
+							"        pm.expect(response.available).to.be.a('boolean');\r",
+							"    });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/books/:bookId",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"books",
+						":bookId"
+					],
+					"variable": [
+						{
+							"key": "bookId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
